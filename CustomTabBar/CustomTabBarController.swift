@@ -27,7 +27,7 @@ class CustomTabBarController: UITabBarController {
         tabBar.frame.size.height = desiredTabBarHeight
         
         tabBar.unselectedItemTintColor = .lightGray
-        tabBar.layer.cornerRadius = 15
+        tabBar.layer.cornerRadius = 15.0
         
         if let items = tabBar.items {
             for item in items {
