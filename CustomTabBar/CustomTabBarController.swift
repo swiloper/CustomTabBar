@@ -7,17 +7,22 @@
 
 import UIKit
 
-class CustomTabBarController: UITabBarController {
-    
+final class CustomTabBarController: UITabBarController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        setupTabBar()
+        layoutTrait(traitCollection: UIScreen.main.traitCollection)
     }
     
-    /// This function changes the appearance of the tabBar.
-    private func setupTabBar() {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        layoutTrait(traitCollection: traitCollection)
+    }
+    
+    /// This function changes the appearance of the tabBar depending on the screen orientation
+    private func layoutTrait(traitCollection: UITraitCollection) {
         let spacing: CGFloat = 10.0
-        let defaultTabBarHeight: CGFloat = 49.0
+        let portraitTabBarHeight: CGFloat = 49.0
+        let landscapeTabBarHeight: CGFloat = 32.0
         let desiredTabBarHeight: CGFloat = 65.0
         
         additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: spacing, right: 0)
@@ -27,7 +32,6 @@ class CustomTabBarController: UITabBarController {
         // Reduces the size of tabBar, taking into account the indentation on the right and left
         tabBar.frame.size.width -= spacing * 2
         // Changes the y-coordinate position of the tabBar by the difference between the standard tabBar height and the custom one
-        tabBar.frame.origin.y -= desiredTabBarHeight - defaultTabBarHeight
         tabBar.frame.size.height = desiredTabBarHeight
         
         tabBar.unselectedItemTintColor = .lightGray
@@ -39,6 +43,20 @@ class CustomTabBarController: UITabBarController {
                 item.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -spacing)
             }
         }
+        
+        if traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular {
+            tabBar.frame.origin.y -= desiredTabBarHeight - portraitTabBarHeight
+        } else {
+            tabBar.frame.origin.y -= desiredTabBarHeight - landscapeTabBarHeight
+        }
     }
 }
 
+extension UITabBar {
+    override open var traitCollection: UITraitCollection {
+        if UIDevice.current.orientation.isLandscape {
+            return UITraitCollection(horizontalSizeClass: .compact)
+        }
+        return super.traitCollection
+    }
+}
